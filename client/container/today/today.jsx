@@ -1,15 +1,26 @@
 import React, { Component } from 'react';
-
+import {ajax} from '../../util'
 export default class extends Component {
   constructor () {
     super();
     this.state = {
-      cnt: 0
+      cnt: 0，
+     list : []
     };
   }
 
-  componentWillMount () {
-
+  componentDidMount () {
+    ajax({
+      method:"POST",
+      url:"http://localhost:8333/api/todaylist",
+      data:{
+        offset:0,
+        limit:5
+      }
+    }).then(res=>{
+      let{list} = res;
+      this.setState({list})
+    })
   }
 
   clickHandler () {
@@ -22,14 +33,20 @@ export default class extends Component {
     let { cnt } = this.state;
 
     return (
-      <div className="page-wrap today-page" ref="todayPage">
-        今日列表
-        <br/>
-        <span>使用 react local state 切换路由后数据就不见了</span>
-        <button onClick={this.clickHandler.bind(this)}>点击数量加一</button>
-        <br/>
-        <span>数量：</span><span>{cnt}</span>
-      </div>
+      <ul className="page-wrap today-page" ref="todayPage">
+        {
+          this.state.list.map((item, index) => {
+            return (
+              <li key={index}>
+                <img src={item.img} alt=""/>
+                <span>{item.userName}</span>
+                <span className='time'>{item.time}</span>
+                <p>{item.text}</p>
+              </li>
+            )
+          })
+        }
+      </ul>
     )
   }
 }
