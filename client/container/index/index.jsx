@@ -14,7 +14,6 @@ export default class extends Component {
 
     };
   }
-
   clickHandler () {
     this.props.setCnt();
   }
@@ -25,7 +24,6 @@ export default class extends Component {
 
     return (
         <div className="page-wrap main-page" ref="mainPage">
-          首页
           <br/>
           <span>使用 react global state(redux store) 切换路由后数据还在</span>
           <br/>
