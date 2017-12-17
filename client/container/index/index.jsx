@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import actions from '../../redux/actions/index.js';
+import {ajax} from '../../util/index';
+import {Link} from 'react-router-dom';
 
 @connect((state) => {
   return {
@@ -11,27 +13,51 @@ export default class extends Component {
   constructor () {
     super();
     this.state = {
-
+      list:[]
     };
   }
 
-  clickHandler () {
-    this.props.setCnt();
+  componentDidMount(){
+    ajax({
+      url:'http://localhost:8333/api/myinfo',
+      method:'GET'
+    }).then(res=>{
+      let {avatar,userName} = res;
+      this.setState({avatar,userName});
+    }).catch(res=>{
+      debugger
+    });
+    ajax({
+      url:'http://localhost:8333/api/mylist',
+      method:'POST',
+      data:{offset:0,limit:2}
+    }).then(res=>{
+      let {list,hasMore} = res;
+      this.setState({list,hasMore});
+    }).catch(res=>{
+      debugger
+    })
   }
 
-
   render () {
-    let { cnt } = this.props.cntData;
-
     return (
         <div className="page-wrap main-page" ref="mainPage">
-          首页
-          <br/>
-          <span>使用 react global state(redux store) 切换路由后数据还在</span>
-          <br/>
-          <button onClick={this.clickHandler.bind(this)}>点击数量加一</button>
-          <br/>
-          <span>数量：</span><span>{cnt}</span>
+          <div className="info">
+            <img src={this.state.avatar}/>
+            <p>{this.state.userName}</p>
+          </div>
+          <Link className="status" to="/status"><b>+</b>添加今日状态</Link>
+          <div>
+            {
+              this.state.list.map((item,index)=>(
+                <Link className="today" key={index} to="/today">
+                  <img src={item.img} alt=""/>
+                  <p className="text">{item.text}</p>
+                  <p className="time">{item.time}</p>
+                </Link>
+              ))
+            }
+          </div>
         </div>
     )
   }
